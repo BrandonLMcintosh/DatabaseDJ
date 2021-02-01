@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template
+from flask import Flask, redirect, render_template, request, flash
 from flask_debugtoolbar import DebugToolbarExtension
 
 
@@ -18,7 +18,7 @@ app.config['SECRET_KEY'] = "I'LL NEVER TELL!!"
 # Having the Debug Toolbar show redirects explicitly is often useful;
 # however, if you want to turn it off, you can uncomment this line:
 #
-# app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 debug = DebugToolbarExtension(app)
 
@@ -47,6 +47,12 @@ def show_playlist(playlist_id):
     """Show detail on specific playlist."""
 
     # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
+    playlist = Playlist.query.get_or_404(playlist_id)
+    print('Playlist Songs on Playlist Page::::::::::::::::::::::::::::::')
+    print(playlist.songs)
+    print('::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::')
+
+    return render_template('playlist.html', playlist=playlist)
 
 
 @app.route("/playlists/add", methods=["GET", "POST"])
@@ -58,6 +64,33 @@ def add_playlist():
     """
 
     # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
+    form = PlaylistForm()
+    if request.method == "GET":
+
+        return render_template('new_playlist.html', form=form)
+
+    elif request.method == "POST":
+
+        if form.validate_on_submit():
+
+            name = form.name.data
+            description = form.description.data
+
+            playlist = Playlist(name=name, description=description)
+
+            db.session.add(playlist)
+            db.session.commit()
+
+            return redirect('/playlists')
+
+        else:
+
+            return render_template('new_playlist.html', form=form)
+
+    else:
+
+        flash('something went wrong')
+        return redirect('/playlists')
 
 
 ##############################################################################
@@ -77,6 +110,8 @@ def show_song(song_id):
     """return a specific song"""
 
     # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
+    song = Song.query.get_or_404(song_id)
+    return render_template('song.html', song=song)
 
 
 @app.route("/songs/add", methods=["GET", "POST"])
@@ -88,6 +123,33 @@ def add_song():
     """
 
     # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
+    form = SongForm()
+    if request.method == "GET":
+
+        return render_template('new_song.html', form=form)
+
+    elif request.method == "POST":
+
+        if form.validate_on_submit():
+
+            title = form.title.data
+            artist = form.artist.data
+
+            song = Song(title=title, artist=artist)
+
+            db.session.add(song)
+            db.session.commit()
+
+            return redirect('/songs')
+
+        else:
+
+            return render_template('new_song.html', form=form)
+
+    else:
+
+        flash('something went wrong')
+        return redirect('/songs')
 
 
 @app.route("/playlists/<int:playlist_id>/add-song", methods=["GET", "POST"])
@@ -103,15 +165,38 @@ def add_song_to_playlist(playlist_id):
 
     # Restrict form to songs not already on this playlist
 
-    curr_on_playlist = ...
-    form.song.choices = ...
+    curr_on_playlist = [song.id for song in playlist.songs]
+    form.song.choices = (db.session.query(Song.id, Song.title)
+                         .filter(Song.id.notin_(curr_on_playlist))
+                         .all())
 
-    if form.validate_on_submit():
+    if request.method == "GET":
 
-          # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
+        return render_template("add_song_to_playlist.html",
+                               playlist=playlist,
+                               form=form)
+    elif request.method == "POST":
+        if form.validate_on_submit():
 
-          return redirect(f"/playlists/{playlist_id}")
+            # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
+            song_id = form.song.data
+            song = Song.query.get_or_404(song_id)
+            playlist.songs.append(song)
+            db.session.add(playlist)
+            db.session.commit()
 
-    return render_template("add_song_to_playlist.html",
-                             playlist=playlist,
-                             form=form)
+            print(
+                'Playlist songs on add route:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::')
+            print(playlist.songs)
+            print(':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::')
+
+            return redirect(f"/playlists/{playlist_id}")
+
+        else:
+
+            return render_template('/add_song_to_playlist.html', playlist=playlist, form=form)
+
+    else:
+
+        flash('something went wrong')
+        return redirect(f'/playlists/{playlist_id}')
