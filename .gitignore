@@ -1,0 +1,3 @@
+databases/venv/
+databases/.vscode/
+databases/__pycache__/
