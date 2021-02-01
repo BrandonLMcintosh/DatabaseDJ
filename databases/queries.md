@@ -18,17 +18,17 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
 1.  The title of every movie.
     - ```sql
 
-    SELECT title
-    FROM movies;
+        SELECT title
+        FROM movies;
 
     ```
 
 2.  All information on the G-rated movies.
     - ```sql
 
-    SELECT title
-    FROM movies
-    WHERE rating = 'G';
+        SELECT title
+        FROM movies
+        WHERE rating = 'G';
 
     ```
 
@@ -36,19 +36,19 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
     oldest movie first.
     - ```sql
 
-    SELECT title, release_year
-    FROM movies
-    ORDER BY release_year;
+        SELECT title, release_year
+        FROM movies
+        ORDER BY release_year;
 
     ```
 
 4.  All information on the 5 longest movies.
     - ```sql
 
-    SELECT *
-    FROM movies
-    ORDER BY runtime
-    LIMIT 5;
+        SELECT *
+        FROM movies
+        ORDER BY runtime
+        LIMIT 5;
 
     ```
 
@@ -56,9 +56,9 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
     total number of G, PG, PG-13, and R-rated movies.
     - ```sql
 
-    SELECT rating, COUNT(\*)
-    FROM movies
-    GROUP BY rating;
+        SELECT rating, COUNT(\*)
+        FROM movies
+        GROUP BY rating;
 
     ```
 
@@ -66,9 +66,9 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
     tabulating the average runtime by year for every movie in the database. The data should be in reverse chronological order (i.e. the most recent year should be first).
     - ```sql
 
-    SELECT release_year, AVG(runtime)
-    FROM movies
-    ORDER BY release_year;
+        SELECT release_year, AVG(runtime)
+        FROM movies
+        ORDER BY release_year;
 
     ```
 
@@ -76,10 +76,10 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
     database.
     - ```sql
 
-    SELECT title, name as studio_name
-    FROM movies
-    JOIN studios
-    ON movies.studio_id = studios.id;
+        SELECT title, name as studio_name
+        FROM movies
+        JOIN studios
+        ON movies.studio_id = studios.id;
 
     ```
 
@@ -87,22 +87,22 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
     matching movie and star pair in the database.
     - ```sql
 
-    SELECT first_name, last_name, title
-    FROM roles
-    JOIN movies on movie_id = movies.id
-    JOIN stars on star_id = stars.id;
+        SELECT first_name, last_name, title
+        FROM roles
+        JOIN movies on movie_id = movies.id
+        JOIN stars on star_id = stars.id;
 
     ```
 
 9.  The first and last names of every star who has been in a G-rated movie. The first and last name should appear only once for each star, even if they are in several G-rated movies. _IMPORTANT NOTE_: it's possible that there can be two _different_ actors with the same name, so make sure your solution accounts for that.
     - ```sql
 
-    SELECT first_name, last_name
-    FROM roles
-    JOIN movies on movie_id = movies.id
-    JOIN stars on star_id = stars.id
-    WHERE rating = 'G'
-    GROUP BY stars.id;
+        SELECT first_name, last_name
+        FROM roles
+        JOIN movies on movie_id = movies.id
+        JOIN stars on star_id = stars.id
+        WHERE rating = 'G'
+        GROUP BY stars.id;
 
     ```
 
@@ -111,11 +111,11 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
     that two different actors with the same name are considered separately).
     - ```sql
 
-    SELECT first_name, last_name, COUNT(*) as num_movies
-    FROM roles
-    JOIN stars on star_id = stars.id
-    GROUP BY stars.id
-    ORDER BY num_movies DESC;
+        SELECT first_name, last_name, COUNT(*) as num_movies
+        FROM roles
+        JOIN stars on star_id = stars.id
+        GROUP BY stars.id
+        ORDER BY num_movies DESC;
 
     ```
 
@@ -125,11 +125,11 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
     that movie, in descending order by the number of stars.
     - ```sql
 
-    SELECT title, COUNT(*) as num_stars
-    FROM roles
-    JOIN movies ON movie_id = movies.id
-    GROUP BY title
-    ORDER BY num_stars DESC;
+        SELECT title, COUNT(*) as num_stars
+        FROM roles
+        JOIN movies ON movie_id = movies.id
+        GROUP BY title
+        ORDER BY num_stars DESC;
 
     ```
 
@@ -137,13 +137,13 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
     stars whose movies have the longest average.
     - ```sql
 
-    SELECT first_name, last_name, AVG(runtime) as avg_runtime
-    FROM roles
-    JOIN movies ON movie_id = movies.id
-    JOIN stars ON star_id = stars.id
-    GROUP BY stars.id
-    ORDER BY avg_runtime DESC
-    LIMIT 5;
+        SELECT first_name, last_name, AVG(runtime) as avg_runtime
+        FROM roles
+        JOIN movies ON movie_id = movies.id
+        JOIN stars ON star_id = stars.id
+        GROUP BY stars.id
+        ORDER BY avg_runtime DESC
+        LIMIT 5;
 
     ```
 
@@ -151,13 +151,13 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
     stars whose movies have the longest average, among stars who have more than one movie in the database.
     - ```sql
 
-    SELECT first_name, last_name, AVG(runtime)
-    FROM roles
-    JOIN movies ON movie_id = movies.id
-    JOIN stars ON star_id = stars.id
-    GROUP BY stars.id
-    HAVING COUNT(movies.id) > 1
-    LIMIT 5;
+        SELECT first_name, last_name, AVG(runtime)
+        FROM roles
+        JOIN movies ON movie_id = movies.id
+        JOIN stars ON star_id = stars.id
+        GROUP BY stars.id
+        HAVING COUNT(movies.id) > 1
+        LIMIT 5;
 
     ```
 
@@ -165,22 +165,22 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
     database.
     - ```sql
 
-    SELECT title
-    FROM roles
-    RIGHT JOIN movies on movie_id = movies.id
-    GROUP BY movies.id
-    HAVING COUNT(star_id) = 0;
+        SELECT title
+        FROM roles
+        RIGHT JOIN movies on movie_id = movies.id
+        GROUP BY movies.id
+        HAVING COUNT(star_id) = 0;
 
     ```
 
 15. The first and last names of all stars that don't appear in any movies in our database.
     - ```sql
 
-    SELECT first_name, last_name
-    FROM roles
-    RIGHT JOIN stars ON star_id = stars.id
-    GROUP BY stars.id
-    HAVING COUNT(movie_id) = 0;
+        SELECT first_name, last_name
+        FROM roles
+        RIGHT JOIN stars ON star_id = stars.id
+        GROUP BY stars.id
+        HAVING COUNT(movie_id) = 0;
 
     ```
 
@@ -188,10 +188,10 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
     role in the database, along with every movie title that doesn't have a star, and the first and last names of every star not in a movie.
     - ```sql
 
-    SELECT first_name, last_name, title
-    FROM roles
-    FULL OUTER JOIN stars ON star_id = stars.id
-    FULL OUTER JOIN movies ON movie_id = movies.id
-    WHERE star_id IS NULL OR movie_id IS NULL;
-    
+        SELECT first_name, last_name, title
+        FROM roles
+        FULL OUTER JOIN stars ON star_id = stars.id
+        FULL OUTER JOIN movies ON movie_id = movies.id
+        WHERE star_id IS NULL OR movie_id IS NULL;
+
     ```
